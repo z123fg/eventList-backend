@@ -1,7 +1,6 @@
 const moment = require("moment");
-const { v4: uuidv4 } = require("uuid");
 const Event = require("../models/event");
-/* GET home page. */
+
 
 exports.getEvents = (req, res) => {
   const limit = +req.query.limit;
@@ -30,15 +29,6 @@ exports.getEvents = (req, res) => {
     });
 };
 
-/* exports.postEvent = (req, res) => {
-  const newItem = {...req.body,id: uuidv4(), isComplete:false };
-  if(validator(newItem)){
-    todoItems.unshift(newItem);
-    res.status(200).json({message:"New event added!",data:newItem});
-  }else{
-    res.status(400).json({message:"Invalid data!"});
-  }
-} */
 
 exports.postEvent = (req, res) => {
   const event = new Event({
@@ -64,29 +54,12 @@ exports.postEvent = (req, res) => {
     });
 };
 
-/* exports.updateEvent = (req,res)=>{
-  const body = req.body;
-  const {id} = req.params
-  if(todoItems[id]){
-    if(validator(body)){
-      todoItems[id] = {...todoItem[id],...body};
-      res.status(200).json({data:todoItems[id],message:"Event updated!"});
-    }else{
-      res.status(400).json({message:"Invalid data!"})
-    }
-    
-  }else{
-    res.status(400).json({message:"Record cannot be found!"})
-  }
-}  */
-
 exports.updateEvent = (req, res) => {
   const { id, ...rest } = req.body;
   const event = new Event({
     _id: id,
     ...rest,
   });
-  console.log("userId",req.userData.userId)
   Event
     .updateOne(
       {
@@ -96,6 +69,7 @@ exports.updateEvent = (req, res) => {
       event
     )
     .then((result) => {
+
       if (result.matchedCount > 0) {
         res.status(200).json({ message: "Update successful!" });
       } else {
@@ -109,20 +83,11 @@ exports.updateEvent = (req, res) => {
     });
 };
 
-/* exports.deleteEvent = (req,res)=>{
-  const {id} = req.params;
-  if(todoItems[id]){
-    todoItems = todoItems.filter(item=>item.id !== id);
-    res.status(200).json({data:todoItems.find(item=>item.id===id),message:"Event deleted!"});
-  }else{
-    res.status(400).json({message:"Record cannot be found!"})
-  }
-} */
+
 
 exports.deleteEvent = (req, res) => {
   Event.deleteOne({ _id: req.params.id , creator:req.userData.userId})
     .then((result) => {
-      console.log("result",result)
       if (result.deletedCount > 0) {
         res.status(200).json({ message: "Deletion successful!" });
       } else {
