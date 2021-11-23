@@ -7,15 +7,16 @@ exports.JWT_KEY = JWT_KEY;
 
 
 exports.createUser = (req, res) => {
+    const {isAdmin} = req.body;
     bcrypt.hash(req.body.password,10).then(hash=>{
         const user = new User({
             username: req.body.username,
-            password:hash
+            password:hash,
+            role:["user", ...(isAdmin?["admin"]:[])]
         })
         user.save().then(result=>{
             res.status(201).json({
-                message:"User created!",
-                result:result
+                message:"User created!"
             })
         }).catch(err=>{
             res.status(500).json({
@@ -49,7 +50,8 @@ exports.userLogin = (req,res,next) => {
         }else{
             const token = jwt.sign({
                 username:fetchedUser.username,
-                userId:fetchedUser._id
+                userId:fetchedUser._id,
+                role:fetchedUser.role
             },
             JWT_KEY,
             {expiresIn:"1h"}
@@ -57,6 +59,7 @@ exports.userLogin = (req,res,next) => {
             res.status(200).json({
                 lastLogin:new Date().toISOString(),
                 username:fetchedUser.username,
+                role:fetchedUser.role,
                 token:token,
                 expiresIn:3600,
                 userId:fetchedUser._id
