@@ -6,11 +6,13 @@ const mongoose = require("mongoose");
 const eventRoutes = require("./routes/event");
 const userRoutes = require("./routes/user");
 
+
+
 var app = express();
 
 mongoose
   .connect(
-    "mongodb+srv://z123fg:Zz931029@cluster0.cclr5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+    "mongodb+srv://antra1018:antra1018@cluster0.0n0zy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
   )
   .then((res) => {
     console.log(`connected to database: ${res}`);
