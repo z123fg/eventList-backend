@@ -19,6 +19,8 @@ exports.getEvents = (req, res) => {
                 description: 'pagination limit'
       } */
 
+
+
   /* #swagger.responses[200] = {
     description:"Event fetched",
     schema:{
@@ -122,9 +124,11 @@ exports.postEvent = (req, res) => {
     updateTime: Date.now(),
   });
 
-  if(new Date(req.body.from).getTime()>new Date(req.body.to).getTime()){
-    return res.status(400).json({message:"'from' time should be before 'to' time"});
-  };
+  if (Date.parse(req.body.from) > Date.parse(req.body.to)) {
+    return res
+      .status(400)
+      .json({ message: "'from' time should be before 'to' time" });
+  }
   event
     .save()
     .then((createdEvent) => {
@@ -144,7 +148,7 @@ exports.postEvent = (req, res) => {
     });
 };
 
-exports.updateEvent = (req, res) => {
+exports.updateEvent = async (req, res) => {
   /*  #swagger.parameters['event'] = {
               in: 'body',
               schema:{
@@ -176,8 +180,18 @@ exports.updateEvent = (req, res) => {
         }
       }
   */
-
+  //should first find one and check the from and to date then update the entry
+  
   let { _id, ...rest } = req.body;
+  
+  if(rest.from || rest.to){
+    const result = await Event.findOne({_id:_id, creator:req.userData.userId});
+    if(Date.parse(result.from) > Date.parse(result.to)){
+      return res.status(400)
+      .json({ message: "'from' time should be before 'to' time" });
+    }
+  }
+
   _id = req.params.id;
   Event.updateOne(
     {
